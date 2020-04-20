@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/novel/novel_content.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        body {
+            background-color: #f7f2e8;
+        }
+
+        .title-card {
+            font-family: 方正启体简体, "Microsoft YaHei", 微软雅黑, 宋体, serif;
+            font-size: 19pt;
+            color: #555555;
+            background-color: rgba(0, 0, 0, 0) !important;
+            border: 1px solid #cbcbcb !important;
+            border-radius: 2px !important;
+        }
+
+        .title-card .card-body {
+            text-align: center;
+        }
+
+        .title-card:hover {
+            background-color: rgba(0, 0, 0, 0) !important;
+        }
+
+        .reading-card {
+            padding: 1rem 2rem;
+            font-family: 方正启体简体, "Microsoft YaHei", 微软雅黑, 宋体, serif;
+            font-size: 19pt;
+            color: #555555;
+            background-color: rgba(0, 0, 0, 0) !important;
+            border: 1px solid #cbcbcb !important;
+            border-radius: 2px !important;
+            position: relative;
+        }
+
+        .title-card a {
+            text-decoration: none !important;
+            color: #858585;
+            transition: color .3s;
+        }
+
+        .title-card a:hover {
+            color: #2b2b2b;
+        }
+
+        .title-card a:focus {
+            color: #2b2b2b;
+        }
+
+        .reading-card:hover {
+            background-color: rgba(0, 0, 0, 0) !important;
+        }
+
+        .bookmark {
+            position: absolute;
+            top: 0;
+            right: 2rem;
+            opacity: 50%;
+            cursor: pointer;
+            transition: opacity .3s;
+        }
+
+        .bookmark img {
+            width: 25px;
+            height: 35px;
+            vertical-align: top !important;
+        }
+
+        .bookmark:hover {
+            opacity: 80%;
+        }
+
+        .tool-btn {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            border: 1px solid #cbcbcb;
+            border-radius: 2px;
+            cursor: pointer;
+            position: fixed;
+        }
+
+        .tool-btn .btn-txt {
+            font-size: 9pt;
+            transition: color .3s;
+        }
+
+        .tool-btn .btn-ico {
+            margin-top: .5rem;
+        }
+
+        .tool-btn .btn-ico i {
+            font-size: 16pt;
+            color: #555555;
+            transition: color .3s;
+        }
+
+        .tool-btn:hover .btn-ico i {
+            color: #ff3333;
+        }
+
+        .tool-btn:hover .btn-txt {
+            color: #ff3333;
+        }
+
+        @media screen and (max-width: 460px) {
+            .tool-btns {
+                display: none;
+            }
+
+            .reading-card {
+                padding: 1rem 0;
+            }
+        }
+
+        .modal-dialog {
+            width: 372px;
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+
+        /* 上方警告框 */
+        .alert-queue {
+            position: fixed;
+            top: 1rem;
+            left: 0;
+            width: 100%;
+            z-index: 99999;
+        }
+
+        .alert-comic {
+            display: none;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, .7);
+            border: none !important;
+            margin: .5rem auto;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        /* 上方警告框 END */
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+<input type="hidden" id="novel-chapter-id" value="{{ novel_chapter.pk }}" />
+<div class="alert-queue" id="alert-queue"></div>
+<div class="container" style="margin-top: 2rem; margin-bottom: 2rem;">
+    <div class="row">
+        <div class="col-sm-11 col-md-11 col-lg-11">
+            <div class="card title-card">
+                <div class="card-body">
+                    {{ novel_chapter.title }}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-11 col-md-11 col-lg-11" style="margin-top: 1rem;">
+            <div class="card reading-card">
+                <div class="card-body">
+                    <div class="bookmark">
+                        <img src="{% static 'app/images/bookmark.png' %}" data-toggle="tooltip" data-placement="top"
+                             title="添加书签"/>
+                    </div>
+                    {{ novel_chapter.content|linebreaksbr }}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-11 col-md-11 col-lg-11" style="margin-top: 1rem;">
+            <div class="card title-card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-4">
+                            {% if pre_record_id is not None %}
+                                <a href="/novels/content/{{ pre_record_id }}">上一章</a>
+                            {% endif %}
+                        </div>
+                        <div class="col-4">
+                            <a href="/novels/{{ novel_chapter.novel_volume.novel.artifact.pk }}">书页</a>
+                        </div>
+                        <div class="col-4">
+                            {% if next_record_id is not None %}
+                                <a href="/novels/content/{{ next_record_id }}">下一章</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1 col-md-1 col-lg-1 tool-btns">
+            <div class="tool-btn" style="top: 2rem;">
+                <div class="btn-ico"><i class="fa fa-rss"></i></div>
+                <div class="btn-txt">订阅</div>
+            </div>
+            <div class="tool-btn" style="top: 7rem;" data-novel-id="{{ novel_chapter.novel_volume.novel.artifact.pk }}"
+                 id="nav-to-novel-page">
+                <div class="btn-ico"><i class="fa fa-book"></i></div>
+                <div class="btn-txt">书页</div>
+            </div>
+            <div class="tool-btn" style="top: 12rem;" id="show-qrcode">
+                <div class="btn-ico"><i class="fa fa-mobile"></i></div>
+                <div class="btn-txt">手机</div>
+            </div>
+            <div class="tool-btn" style="bottom: 2rem;" id="back-top">
+                <div class="btn-ico" style="margin-top: 1rem;"><i class="fa fa-arrow-up"></i></div>
+                <div class="btn-txt"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">分享二维码</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe id="share-frame" style="width: 370px; height: 370px;" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

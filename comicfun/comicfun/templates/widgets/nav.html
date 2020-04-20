@@ -1,0 +1,65 @@
+<div>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light t-shadow">
+        <a class="navbar-brand" href="/"><i class="fa fa-heart" style="color: #ff6a5e"></i> ComicFun</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/novels/category">小说</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/comics/category">漫画</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/animations/category">动画</a>
+                </li>
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="#">游戏</a>#}
+{#                </li>#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="#">绘画</a>#}
+{#                </li>#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="#">素材</a>#}
+{#                </li>#}
+            </ul>
+            <form action="/search" method="get" class="form-inline my-2 my-lg-0 ml-lg-5">
+                <input name="pattern" class="form-control mr-sm-2 bg-light-lighten-5" type="search" placeholder="搜索"
+                    aria-label="Search" value="{{ pattern }}">
+                <button class="btn btn-primary my-2 my-sm-0" type="submit"><i class="fa fa-search"></i></button>
+            </form>
+            {% if request.user is not None and request.user.pk is not None %}
+                <ul class="navbar-nav ml-auto mr-5">
+                    <li class="nav-item dropdown" style="width: 7rem;">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ request.user.username }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% if request.user.is_staff == 1 %}
+                                <a class="dropdown-item" href="#"><i class="fa fa-cogs"></i> ComicCMS</a>
+                                <a class="dropdown-item" href="/admin"><i class="fa fa-cog"></i> Admin面板</a>
+                                <div class="dropdown-divider"></div>
+                            {% endif %}
+{#                            <a class="dropdown-item" href="#"><i class="fa fa-rss"></i> 我的订阅</a>#}
+                            <a class="dropdown-item" href="/bookmark"><i class="fa fa-bookmark"></i> 我的书签</a>
+                            <a class="dropdown-item" href="/account"><i class="fa fa-user-circle"></i> 账号信息</a>
+                            <a class="dropdown-item" href="/logout"><i class="fa fa-sign-out-alt"></i> 退出登录</a>
+                        </div>
+                    </li>
+                </ul>
+            {% else %}
+                <ul class="navbar-nav ml-auto mr-5">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="/login" role="button">
+                            登录
+                        </a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </nav>
+</div>

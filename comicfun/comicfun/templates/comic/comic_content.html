@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/app.js' %}"></script>
+    <script src="{% static 'app/js/comic/comic_content.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        body {
+            background-color: #000000;
+        }
+
+        .comic-display-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .comic-display-container img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* 上方警告框 */
+        .alert-queue {
+            position: fixed;
+            top: 1rem;
+            left: 0;
+            width: 100%;
+        }
+
+        .alert-comic {
+            display: none;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, .6);
+            border-color: rgba(0, 0, 0, .9);
+            margin: .5rem auto;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        /* 上方警告框 END */
+
+        /* 上方页码 */
+        .page-info {
+            position: fixed;
+            top: 0;
+            left: 1rem;
+            width: 5rem;
+            background-color: rgba(0, 0, 0, .6);
+            color: #ffffff;
+            font-size: 20pt;
+        }
+
+        /* 上方页码 END */
+
+        /* 下方按钮组 */
+        .toolbar-container {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, .6);
+        }
+
+        .toolbar-container .toolbar {
+            margin: 0 auto;
+            width: 23rem;
+            height: 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn {
+            margin: .1rem;
+        }
+
+        /* 下方按钮组 END */
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+<input type="hidden" id="comic-page-links" value="{{ comic_page_links }}"/>
+<div class="comic-display-container">
+    <img id="comic-display" src="#"/>
+</div>
+<div class="page-info" style="display: none;" id="page-info-container">
+    <span>P</span>
+    <span id="current-page"></span>
+</div>
+<div class="alert-queue" id="alert-queue"></div>
+<div class="toolbar-container" id="toolbar-container" style="display: none;">
+    <div class="toolbar">
+        <button class="btn btn-outline-light" id="pre-chapter" data-nav-chapter-id="{{ pre_record_id }}">上一话</button>
+        <button class="btn btn-outline-light" id="pre-page"><i class="fa fa-angle-left"></i></button>
+        <button class="btn btn-outline-light" id="back"
+                data-nav-artifact-id="{{ comic_chapter.comic_volume.comic.artifact.pk }}">返回目录
+        </button>
+        <button class="btn btn-outline-light" id="next-page"><i class="fa fa-angle-right"></i></button>
+        <button class="btn btn-outline-light" id="next-chapter" data-nav-chapter-id="{{ next_record_id }}">下一话</button>
+        <button class="btn btn-outline-light" id="bookmark" data-chapter-id="{{ comic_chapter.pk }}"
+                data-toggle="tooltip" data-placement="top" title="添加书签"><i class="fa fa-bookmark"></i></button>
+    </div>
+</div>
+</body>
+</html>

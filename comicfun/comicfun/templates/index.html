@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/index.js' %}"></script>
+    <script src="{% static 'app/js/app.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        /* 全新发布版块 */
+        .link-group-item {
+            display: block;
+            margin: 1rem 0;
+        }
+
+        /* 全新发布版块 END */
+
+        /* 作者卡片 */
+        .author-card {
+            cursor: pointer;
+            background-color: rgba(159, 86, 229, 0.13) !important;
+            transition: background-color .3s;
+        }
+
+        .author-card:hover {
+            background-color: rgba(248, 249, 250, 0.8) !important;
+        }
+
+        .author-card .card-avatar {
+            float: left;
+        }
+
+        .author-card .card-avatar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 999px;
+        }
+
+        .author-card .card-info {
+            float: left;
+            margin-left: 1rem;
+        }
+
+        .author-card .card-info .author-gender-genderless {
+            color: #6c6c6c;
+        }
+
+        .author-card .card-info .author-gender-mars {
+            color: #55d1eb;
+        }
+
+        .author-card .card-info .author-gender-venus {
+            color: #ffa2a8;
+        }
+
+        .author-card .card-info .author-gender-transgender {
+            color: #ffa2a8;
+        }
+
+        .author-card .card-info .author-released-ico {
+            color: #ffd700;
+        }
+
+        /* 作者卡片 END */
+
+        /* 小说卡片 */
+        .cover-card {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .cover-card .cover {
+            border-radius: 2px;
+            width: 150px;
+            margin: 0 auto;
+        }
+
+        .cover-card .cover img {
+            width: 150px;
+            height: 200px;
+            filter: brightness(80%);
+            transition: filter .3s;
+        }
+
+        .cover-card .cover:hover img {
+            filter: brightness(100%);
+        }
+
+        .cover-card .novel-name {
+            color: #6c6c6c;
+            transition: color .3s;
+        }
+
+        .cover-card:hover .novel-name {
+            color: #454545;
+        }
+        /* 小说卡片 END */
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 4rem">
+    <div class="card bg-light-lighten-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-6">
+                    <div id="carousel-index" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            {% for carousel in carousel_list %}
+                                <li data-target="#carousel-index"
+                                    data-slide-to="{{ forloop.counter0 }}"
+                                    {% if forloop.counter0 == 0 %}
+                                        class="active"
+                                    {% endif %}
+                                ></li>
+                            {% endfor %}
+                        </ol>
+                        <div class="carousel-inner">
+                            {% for carousel in carousel_list %}
+                                <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
+                                    {% if carousel.target_url is not None and carousel.target_url != '' %}
+                                        <a href="{{ carousel.target_url }}">
+                                    {% endif %}
+                                        <img src="{{ carousel.img_url }}"
+                                             class="d-block w-100">
+                                    {% if carousel.target_url is not None and carousel.target_url != '' %}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <a class="carousel-control-prev" href="#carousel-index" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#carousel-index" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-6">
+                    <h4 class="fg-dark-lighten-5">更新速递</h4>
+                    <div class="">
+                        {% for news in news_list %}
+                            {% if news.target_url is not None and news.target_url != '' %}
+                                <a href="{{ news.target_url }}" class="link-group-item">{{ news.txt }}</a>
+                            {% else %}
+                                <div class="link-group-item">{{ news.txt }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card content-vmargin">
+        <div class="card-header">热门收录</div>
+        <div class="card-body">
+            <div class="row">
+                {% for author in author_list %}
+                    <div class="col-sm-12 col-md-6 col-lg-3">
+                        <div class="card author-card">
+                            <div class="card-body">
+                                <div class="card-avatar">
+                                    {% if author.avatar_url == null or author.avatar_url == '' %}
+                                        <img src="{% static 'app/images/default_avatar.jpg' %}"/>
+                                    {% else %}
+                                        <img src="{{ author.avatar_url }}"/>
+                                    {% endif %}
+                                </div>
+                                <div class="card-info">
+                                    <div>
+                                        <span class="author-name">{{ author.name }}</span>
+                                        {% if author.sex == 0 %}
+                                            <span class="author-gender-genderless"><i class="fa fa-genderless"></i></span>
+                                        {% elif author.sex == 1 %}
+                                            <span class="author-gender-mars"><i class="fa fa-mars"></i></span>
+                                        {% elif author.sex == 2 %}
+                                            <span class="author-gender-venus"><i class="fa fa-venus"></i></span>
+                                        {% elif author.sex == 3 %}
+                                            <span class="author-gender-transgender"><i class="fa fa-transgender"></i></span>
+                                        {% endif %}
+                                    </div>
+                                    <div title="收录作品数">
+                                        <span class="author-released-ico"><i class="fa fa-star"></i></span>
+                                        <span class="author-released-cnt">{{ author.released_cnt }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="card content-vmargin">
+        <div class="card-header">小说推荐</div>
+        <div class="card-body">
+            <div class="row">
+                {% for novel_artifact in novel_list %}
+                    <div class="col-sm-12 col-md-6 col-lg-3">
+                        <div class="cover-card">
+                            <div class="cover" data-nav-type="novel" data-artifact-id="{{ novel_artifact.pk }}">
+                                <img src="{{ novel_artifact.novel.cover_img_url }}" />
+                                <div class="card-name">{{ novel_artifact.title }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="card content-vmargin">
+        <div class="card-header">漫画推荐</div>
+        <div class="card-body">
+            <div class="row">
+                {% for comic_artifact in comic_list %}
+                    <div class="col-sm-12 col-md-6 col-lg-3">
+                        <div class="cover-card">
+                            <div class="cover" data-nav-type="comic" data-artifact-id="{{ comic_artifact.pk }}">
+                                <img src="{{ comic_artifact.comic.cover_img_url }}" />
+                                <div class="card-name">{{ comic_artifact.title }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="card content-vmargin">
+        <div class="card-header">动画推荐</div>
+        <div class="card-body">
+            <div class="row">
+                {% for animation_artifact in animation_list %}
+                    <div class="col-sm-12 col-md-6 col-lg-3">
+                        <div class="cover-card">
+                            <div class="cover" data-nav-type="animation" data-artifact-id="{{ animation_artifact.pk }}">
+                                <img src="{{ animation_artifact.animation.cover_img_url }}" />
+                                <div class="card-name">{{ animation_artifact.title }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% include 'widgets/footer.html' %}
+</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/app.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style></style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 4rem">
+    <div class="card">
+    <div class="card-header">动画分区</div>
+        <div class="card-body">
+            <div class="row">
+                {% for content_tag in content_tags %}
+                    <div class="col-sm-12 col-md-6 col-lg-3">
+                        <div class="cover-card">
+                            <div class="cover" data-nav-type="tag-animation" data-tag-id="{{ content_tag.pk }}">
+                                <img src="{{ content_tag.tag_img_url }}"/>
+                                <div class="card-name">{{ content_tag.name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% include 'widgets/footer.html' %}
+</div>
+</body>
+</html>

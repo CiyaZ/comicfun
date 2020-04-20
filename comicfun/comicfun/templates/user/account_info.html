@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/user/account_info.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 7rem">
+    <div class="row justify-content-center" style="margin-top: 1rem;">
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    账号信息
+                </div>
+                <div class="card-body">
+                    <form action="/account/update" method="post" onsubmit="return check();">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="username" class="d-none">用户名</label>
+                                    <input type="text" class="form-control" id="username" name="username" disabled
+                                           autocomplete="off" placeholder="用户名" value="{{ request.user.username }}"/>
+                                    <div class="invalid-feedback" id="username-err"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="lastname" class="d-none">姓</label>
+                                    <input type="text" class="form-control" id="lastname" name="lastname"
+                                           autocomplete="off" placeholder="姓" value="{{ request.user.last_name }}"/>
+                                    <div class="invalid-feedback" id="lastname-err"></div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="firstname" class="d-none">名</label>
+                                    <input type="text" class="form-control" id="firstname" name="firstname"
+                                           autocomplete="off" placeholder="名" value="{{ request.user.first_name }}"/>
+                                    <div class="invalid-feedback" id="firstname-err"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="email" class="d-none">邮箱</label>
+                                    <input type="text" class="form-control" id="email" name="email"
+                                           autocomplete="off" placeholder="邮箱" value="{{ request.user.email }}"/>
+                                    <div class="invalid-feedback" id="email-err"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                {% if success_msg %}
+                                    <span style="color: #28a745; float: left;">{{ success_msg }}</span>
+                                {% endif %}
+                                <button type="reset" class="btn btn-danger" style="float: right;">重置</button>
+                                <button type="submit" class="btn btn-success" style="float: right; margin-right: .5rem;">保存</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

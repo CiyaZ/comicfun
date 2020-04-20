@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/app.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        .list-group {
+            width: 100%;
+        }
+
+        .list-group-item span {
+            font-size: 20pt;
+        }
+
+        .fl {
+            float: left;
+        }
+
+        .fr {
+            float: right;
+        }
+
+        .ml-2 {
+            margin-left: 2rem;
+        }
+
+        .mr-2 {
+            margin-right: 2rem;
+        }
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 4rem">
+    {% if novel_bookmarks|length != 0 %}
+        <div class="card content-vmargin">
+            <div class="card-header">小说书签</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="list-group">
+                            {% for bookmark in novel_bookmarks %}
+                                <div class="list-group-item">
+                                    <span class="fl">
+                                        <i class="fa fa-bookmark"></i>
+                                    </span>
+                                    <span class="fl ml-2">{{ bookmark.novel_chapter.novel_volume.novel.artifact.title }}</span>
+                                    <span class="fl ml-2">{{ bookmark.novel_chapter.novel_volume.title }}</span>
+                                    <span class="fl ml-2">{{ bookmark.novel_chapter.title }}</span>
+                                    <span class="fr ml-2">
+                                        <a class="btn btn-danger" href="/bookmark/delete?id={{ bookmark.pk }}">删除</a>
+                                        <a class="btn btn-primary" href="{{ bookmark.target_link }}">GO</a>
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if comic_bookmarks|length != 0 %}
+        <div class="card content-vmargin">
+            <div class="card-header">漫画书签</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="list-group">
+                            {% for bookmark in comic_bookmarks %}
+                                <div class="list-group-item">
+                                    <span class="fl">
+                                        <i class="fa fa-bookmark"></i>
+                                    </span>
+                                    <span class="fl ml-2">{{ bookmark.comic_page.comic_chapter.comic_volume.comic.artifact.title }}</span>
+                                    <span class="fl ml-2">{{ bookmark.comic_page.comic_chapter.comic_volume.title }}</span>
+                                    <span class="fl ml-2">{{ bookmark.comic_page.comic_chapter.title }}</span>
+                                    <span class="fr ml-2">
+                                        <a class="btn btn-danger" href="/bookmark/delete?id={{ bookmark.pk }}">删除</a>
+                                        <a class="btn btn-primary" href="{{ bookmark.target_link }}">GO</a>
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if animation_bookmarks|length != 0 %}
+    <div class="card content-vmargin">
+        <div class="card-header">动画书签</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="list-group">
+                        {% for bookmark in animation_bookmarks %}
+                            <div class="list-group-item">
+                                <span class="fl">
+                                    <i class="fa fa-bookmark"></i>
+                                </span>
+                                <span class="fl ml-2">{{ bookmark.animation_chapter.animation_volume.animation.artifact.title }}</span>
+                                <span class="fl ml-2">{{ bookmark.animation_chapter.animation_volume.title }}</span>
+                                <span class="fl ml-2">{{ bookmark.animation_chapter.title }}</span>
+                                <span class="fr ml-2">
+                                    <a class="btn btn-danger" href="/bookmark/delete?id={{ bookmark.pk }}">删除</a>
+                                    <a class="btn btn-primary" href="{{ bookmark.target_link }}">GO</a>
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% include 'widgets/footer.html' %}
+</div>
+</body>
+</html>

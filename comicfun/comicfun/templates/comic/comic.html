@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        .info-row {
+            margin-top: .6rem;
+        }
+
+        .info-row .comic-title {
+            font-size: 26px;
+            font-weight: 400;
+        }
+
+        .info-row .comic-authors {
+            margin-left: 1rem;
+        }
+
+        .split-line {
+            margin-top: .5rem;
+            height: 1px;
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .comic-desc {
+            margin-top: 1rem;
+            color: #515151;
+        }
+
+        .volume-title {
+            font-size: 20px;
+            font-weight: 400;
+            margin-top: 1rem;
+        }
+
+        .volume-content {
+            margin-top: .7rem;
+        }
+
+        .volume-content a {
+            font-size: 16px;
+        }
+
+        .volume-content .link {
+            padding: .3rem 1rem;
+        }
+
+        .volume-content .link a {
+            border: 1px solid #cbcbcb;
+            transition: border-color .1s;
+        }
+
+        .volume-content .link a:hover {
+            border: 1px solid #6f42c1;
+        }
+
+        .comic-btn {
+            width: 100%;
+        }
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 4rem">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-2 col-md-2 col-lg-2">
+                    <img src="{{ comic_artifact.comic.cover_img_url }}" style="width: 150px; height: 200px;"/>
+                </div>
+                <div class="col-sm-10 col-md-10 col-lg-10">
+                    <div class="info-row" style="margin-top: 1.7rem;">
+                        <span class="comic-title">{{ comic_artifact.title }}</span>
+                        <span class="comic-authors">
+                            <span>作者：</span>
+                            <span>
+                                {% for author in authors %}
+                                    <a href="#">{{ author.name }}</a>
+                                    {% if forloop.counter != authors.count %}
+                                        <span>/</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span>标签分类：</span>
+                        <span>
+                            {% for content_tag in content_tags %}
+                                <a href="/comics?tag_id={{ content_tag.pk }}">{{ content_tag.name }}</a>
+                                {% if forloop.counter != content_tags.count %}
+                                    <span>/</span>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span>更新时间：</span>
+                        <span>{{ comic_artifact.last_modified_time }}</span>
+                        {% if comic_artifact.comic.is_completed == 1 %}
+                            <span>已完结</span>
+                        {% else %}
+                            <span>连载中</span>
+                        {% endif %}
+                    </div>
+                    <div class="info-row">
+                        <a class="btn btn-primary" style="text-shadow: none; color: #ffffff;" href="/comics/content/{{ comic_chapters_arr.0.0.pk }}"><i class="fa fa-book"></i> 开始阅读</a>
+                        <button class="btn btn-dark" id="subscribe" onclick="alert('暂不支持该功能');"><i class="fa fa-star"></i> 订阅</button>
+                        {% if comic_artifact.comic.download_link is not None and comic_artifact.comic.download_link != '' %}
+                            <a class="btn btn-dark" href="{{ comic_artifact.comic.download_link }}" style="text-shadow: none;"><i class="fa fa-download"></i> 下载</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="comic-desc">
+                <p>作品简介：{{ comic_artifact.desc }}</p>
+            </div>
+            <div class="split-line"></div>
+            <div>
+                {% for comic_volume in comic_volumes %}
+                    <div>
+                        {% if comic_volumes.count != 1 or comic_volume.title != '默认卷' %}
+                            <div class="volume-title">{{ comic_volume.title }}</div>
+                        {% endif %}
+                        <div class="row volume-content">
+                            {% for comic_chapters in comic_chapters_arr %}
+                                {% if forloop.counter == forloop.parentloop.counter %}
+                                    {% for comic_chapter in comic_chapters %}
+                                        <div class="col-sm-3 col-md-3 col-lg-3 link">
+                                            <a class="comic-btn btn btn-light" href="/comics/content/{{ comic_chapter.pk }}">{{ comic_chapter.title }}</a>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% include 'widgets/footer.html' %}
+</div>
+</body>
+</html>

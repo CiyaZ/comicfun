@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/app.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        .info-row {
+            margin-top: .6rem;
+        }
+
+        .info-row .novel-title {
+            font-size: 26px;
+            font-weight: 400;
+        }
+
+        .info-row .novel-authors {
+            margin-left: 1rem;
+        }
+        .cover-card {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .cover-card .cover {
+            border-radius: 2px;
+            width: 150px;
+            margin: 0 auto;
+        }
+
+        .cover-card .cover img {
+            width: 150px;
+            height: 200px;
+            filter: brightness(80%);
+            transition: filter .3s;
+        }
+
+        .cover-card .cover:hover img {
+            filter: brightness(100%);
+        }
+
+        .cover-card .novel-name {
+            color: #6c6c6c;
+            transition: color .3s;
+        }
+
+        .cover-card:hover .novel-name {
+            color: #454545;
+        }
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 7rem">
+    <div class="card">
+        <div class="card-body">
+            {% for artifact in artifact_list_page.object_list %}
+                {% if artifact.content_type == 1 %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-2 col-md-2 col-lg-2">
+                                    <div class="cover-card">
+                                        <div class="cover" data-nav-type="novel" data-artifact-id="{{ artifact.pk }}">
+                                            <img src="{{ artifact.novel.cover_img_url }}" style="width: 150px; height: 200px;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10 col-md-10 col-lg-10">
+                                    <div class="info-row" style="margin-top: 1.7rem;">
+                                        <span class="novel-title">{{ artifact.title }}</span>
+                                        <span class="novel-authors">
+                                            <span>作者：</span>
+                                            <span>
+                                                {% for author in artifact.authors.all %}
+                                                    <a href="#">{{ author.name }}</a>
+                                                    {% if forloop.counter != artifact.authors.all.count %}
+                                                        <span>/</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">类型：小说</div>
+                                    <div class="info-row">
+                                        <span>标签分类：</span>
+                                        <span>
+                                            {% for content_tag in artifact.content_tags.all %}
+                                                <a href="/novels?tag_id={{ content_tag.pk }}">{{ content_tag.name }}</a>
+                                                {% if forloop.counter != artifact.content_tags.all.count %}
+                                                    <span>/</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>更新时间：</span>
+                                        <span>{{ artifact.last_modified_time }}</span>
+                                        {% if artifact.novel.is_completed == 1 %}
+                                            <span>已完结</span>
+                                        {% else %}
+                                            <span>连载中</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif artifact.content_type == 2 %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-2 col-md-2 col-lg-2">
+                                    <div class="cover-card">
+                                        <div class="cover" data-nav-type="comic" data-artifact-id="{{ artifact.pk }}">
+                                            <img src="{{ artifact.comic.cover_img_url }}" style="width: 150px; height: 200px;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10 col-md-10 col-lg-10">
+                                    <div class="info-row" style="margin-top: 1.7rem;">
+                                        <span class="novel-title">{{ artifact.title }}</span>
+                                        <span class="novel-authors">
+                                            <span>作者：</span>
+                                            <span>
+                                                {% for author in artifact.authors.all %}
+                                                    <a href="#">{{ author.name }}</a>
+                                                    {% if forloop.counter != artifact.authors.all.count %}
+                                                        <span>/</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">类型：漫画</div>
+                                    <div class="info-row">
+                                        <span>标签分类：</span>
+                                        <span>
+                                            {% for content_tag in artifact.content_tags.all %}
+                                                <a href="/comics?tag_id={{ content_tag.pk }}">{{ content_tag.name }}</a>
+                                                {% if forloop.counter != artifact.content_tags.all.count %}
+                                                    <span>/</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>更新时间：</span>
+                                        <span>{{ artifact.last_modified_time }}</span>
+                                        {% if artifact.comic.is_completed == 1 %}
+                                            <span>已完结</span>
+                                        {% else %}
+                                            <span>连载中</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif artifact.content_type == 3 %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-2 col-md-2 col-lg-2">
+                                    <div class="cover-card">
+                                        <div class="cover" data-nav-type="animation" data-artifact-id="{{ artifact.pk }}">
+                                            <img src="{{ artifact.animation.cover_img_url }}" style="width: 150px; height: 200px;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-10 col-md-10 col-lg-10">
+                                    <div class="info-row" style="margin-top: 1.7rem;">
+                                        <span class="novel-title">{{ artifact.title }}</span>
+                                        <span class="novel-authors">
+                                            <span>作者：</span>
+                                            <span>
+                                                {% for author in artifact.authors.all %}
+                                                    <a href="#">{{ author.name }}</a>
+                                                    {% if forloop.counter != artifact.authors.all.count %}
+                                                        <span>/</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="info-row">类型：动画</div>
+                                    <div class="info-row">
+                                        <span>标签分类：</span>
+                                        <span>
+                                            {% for content_tag in artifact.content_tags.all %}
+                                                <a href="/animations?tag_id={{ content_tag.pk }}">{{ content_tag.name }}</a>
+                                                {% if forloop.counter != artifact.content_tags.all.count %}
+                                                    <span>/</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span>更新时间：</span>
+                                        <span>{{ artifact.last_modified_time }}</span>
+                                        {% if artifact.comic.is_completed == 1 %}
+                                            <span>已完结</span>
+                                        {% else %}
+                                            <span>连载中</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% if artifact_list_page.has_next or artifact_list_page.has_previous %}
+        <div class="card" style="margin-top: 1rem;">
+            <div class="card-body" style="padding: 0 1rem;">
+                <ul class="pagination justify-content-center" style="margin-top: 1rem">
+                    {% if artifact_list_page.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="/novels?tag_id={{ content_tag_id }}&current_page={{ artifact_list_page.previous_page_number }}">
+                                <span>&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for page_btn in page_btn_list %}
+                        <li class="page-item {% if page_btn == current_page %}active{% endif %}">
+                            <a class="page-link"
+                               href="/novels?tag_id={{ content_tag_id }}&current_page={{ page_btn }}">{{ page_btn }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if artifact_list_page.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="/novels?tag_id={{ content_tag_id }}&current_page={{ artifact_list_page.next_page_number }}">
+                                <span>&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>

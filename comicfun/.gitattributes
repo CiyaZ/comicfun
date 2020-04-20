@@ -1,0 +1,4 @@
+static/bootstrap/* linguist-vendored
+static/fontawesome/* linguist-vendored
+static/jquery/* linguist-vendored
+comicfun/templates/* linguist-vendored

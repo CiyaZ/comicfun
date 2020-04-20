@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/app.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style></style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 4rem">
+    <div class="card">
+        <div class="card-header">小说分区</div>
+        <div class="card-body">
+            <div class="row">
+                {% for novel_artifact in artifact_list_page.object_list %}
+                    <div class="col-sm-12 col-md-6 col-lg-3">
+                        <div class="cover-card">
+                            <div class="cover" data-nav-type="novel" data-artifact-id="{{ novel_artifact.pk }}">
+                                <img src="{{ novel_artifact.novel.cover_img_url }}"/>
+                                <div class="card-name">{{ novel_artifact.title }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% if artifact_list_page.has_next or artifact_list_page.has_previous %}
+    <div class="card" style="margin-top: 1rem;">
+        <div class="card-body" style="padding: 0 1rem;">
+            <ul class="pagination justify-content-center" style="margin-top: 1rem">
+                {% if artifact_list_page.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="/novels?tag_id={{ content_tag_id }}&current_page={{ artifact_list_page.previous_page_number }}">
+                        <span>&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% for page_btn in page_btn_list %}
+                <li class="page-item {%if page_btn == current_page %}active{% endif %}">
+                    <a class="page-link"
+                        href="/novels?tag_id={{ content_tag_id }}&current_page={{ page_btn }}">{{ page_btn }}</a>
+                </li>
+                {% endfor %}
+                {% if artifact_list_page.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="/novels?tag_id={{ content_tag_id }}&current_page={{ artifact_list_page.next_page_number }}">
+                        <span>&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+    {% include 'widgets/footer.html' %}
+</div>
+</body>
+</html>

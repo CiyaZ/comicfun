@@ -1,0 +1,5 @@
+<div class="bg-img"
+     {% if request.site_conf.site_background != None %}
+         style="background: url('{{ request.site_conf.site_background }}') no-repeat fixed; background-size: cover;"
+     {% endif %}
+></div>

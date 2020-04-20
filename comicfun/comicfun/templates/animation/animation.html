@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'xgplayer/xgplayer.js' %}"></script>
+    <script src="{% static 'app/js/app.js' %}"></script>
+    <script src="{% static 'app/js/animation/animation.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        .info-row {
+            margin-top: .6rem;
+        }
+
+        .info-row .comic-title {
+            font-size: 26px;
+            font-weight: 400;
+        }
+
+        .info-row .comic-authors {
+            margin-left: 1rem;
+        }
+
+        .split-line {
+            margin-top: .5rem;
+            height: 1px;
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .volume-content {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .animation-chooser {
+            padding: .3rem .2rem;
+            text-align: center;
+        }
+
+        .animation-chooser a {
+            width: 100%;
+        }
+        /* 上方警告框 */
+        .alert-queue {
+            position: fixed;
+            top: 1rem;
+            left: 0;
+            width: 100%;
+            z-index: 99999;
+        }
+
+        .alert-comic {
+            display: none;
+            color: #ffffff;
+            background-color: rgba(0, 0, 0, .7);
+            border: none !important;
+            margin: .5rem auto;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        /* 上方警告框 END */
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+{% csrf_token %}
+<div class="alert-queue" id="alert-queue"></div>
+<div class="container t-shadow" style="margin-top: 4rem">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-7">
+                    <div id="player-block" data-animation-url="{{ init_chapter.content_url }}"></div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-5">
+                    <div class="info-row" style="margin-top: 1.7rem;">
+                        <span class="comic-title">{{ animation_artifact.title }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span>标签分类：</span>
+                        <span>
+                            {% for content_tag in content_tags %}
+                                <a href="/animations?tag_id={{ content_tag.pk }}">{{ content_tag.name }}</a>
+                                {% if forloop.counter != content_tags.count %}
+                                    <span>/</span>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span>更新时间：</span>
+                        <span>{{ animation_artifact.last_modified_time }}</span>
+                        {% if animation_artifact.animation.is_completed == 1 %}
+                            <span>已完结</span>
+                        {% else %}
+                            <span>连载中</span>
+                        {% endif %}
+                    </div>
+                    <div class="split-line"></div>
+                    <div class="info-row">
+                        <button class="btn btn-primary" id="collect" onclick="alert('暂不支持该功能');">
+                            <i class="fa fa-star"></i> 收藏
+                        </button>
+                        <button class="btn btn-primary" id="bookmark" data-chapter-id="{{ init_chapter.pk }}">
+                            <i class="fa fa-bookmark"></i> 书签
+                        </button>
+                    </div>
+                    <div class="split-line"></div>
+                    <div class="info-row">
+                        <span>简介：</span>
+                        <span>
+                            {{ animation_artifact.desc|slice:":150" }}
+                            {% if animation_artifact.desc|length > 150 %}
+                                ...
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="margin-top: 1rem;">
+        <div class="card-body">
+            {% if animation_volumes.count > 1 %}
+                <ul class="nav nav-tabs">
+                    {% for animation_volume in animation_volumes %}
+                        <li class="nav-item volume-tab">
+                            <a class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}"
+                               data-volume-idx="{{ forloop.counter0 }}" href="#"
+                               style="color: #6f42c1;">{{ animation_volume.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <input type="hidden" id="init-chapter-id" value="{{ init_chapter.pk }}"/>
+            {% for animation_chapters in animation_chapters_arr %}
+                <div class="volume-content" data-volume-idx="{{ forloop.counter0 }}">
+                    <div class="row" style="padding: 0 .6rem;">
+                        {% for animation_chapter in animation_chapters %}
+                            <div class="col-sm-2 col-md-2 col-lg-2 animation-chooser">
+                                <a class="btn btn-outline-primary volume-btn"
+                                   href="/animations/{{ animation_artifact.pk }}?chapter_id={{ animation_chapter.pk }}"
+                                   data-chapter-id="{{ animation_chapter.pk }}">{{ animation_chapter.title }}</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% include 'widgets/footer.html' %}
+</div>
+</body>
+</html>

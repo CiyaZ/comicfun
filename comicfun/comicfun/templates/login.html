@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'app/js/login.js' %}"></script>
+    {% include 'widgets/color_theme.html' %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <style>
+        .login-title {
+            text-align: center;
+        }
+
+        .login-title span {
+            color: #ffffff;
+            font-size: 23pt;
+        }
+    </style>
+    <title>ComicFun</title>
+</head>
+<body>
+{% include 'widgets/bg_img.html' %}
+{% include 'widgets/nav.html' %}
+<div class="container t-shadow" style="margin-top: 7rem">
+    <div class="login-title">
+        <span>ComicFun</span>
+    </div>
+    <div class="row justify-content-center" style="margin-top: 1rem;">
+        <div class="col-sm-12 col-md-4 col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    登录
+                </div>
+                <div class="card-body">
+                    <form action="/login/submit" method="post" onsubmit="return check();">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="username" class="d-none">用户名</label>
+                            <input type="text" class="form-control" id="username" name="username" autocomplete="off" placeholder="用户名" value="{{ username }}" />
+                            <div class="invalid-feedback" id="username-err"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="d-none">密码</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="密码" />
+                            <div class="invalid-feedback" id="password-err"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-8">
+                                <label for="captcha-value" class="d-none">验证码</label>
+                                <input type="text" class="form-control" name="captcha-value" id="captcha-value" placeholder="验证码" />
+                                <input type="hidden" name="captcha-key" id="captcha-key" value="{{ captcha_key }}" />
+                                <div class="invalid-feedback" id="captcha-err"></div>
+                            </div>
+                            <div class="col-4" style="cursor: pointer;">
+                                <img src="{{ image_url }}" alt="点击换一张" id="captcha-img" />
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <span style="float: left;" class="err-msg">{{ err_msg }}</span>
+                            <button type="reset" class="btn btn-danger" style="float: right;">重置</button>
+                            <button type="submit" class="btn btn-primary" style="float: right; margin-right: .5rem;">登录</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
