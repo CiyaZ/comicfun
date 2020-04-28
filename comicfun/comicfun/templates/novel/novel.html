@@ -105,7 +105,7 @@
                     </div>
                     <div class="info-row">
                         <a class="btn btn-primary" style="text-shadow: none; color: #ffffff;" href="/novels/content/{{ novel_chapters_arr.0.0.pk }}"><i class="fa fa-book"></i> 开始阅读</a>
-                        <button class="btn btn-dark" id="subscribe"><i class="fa fa-star" onclick="alert('暂不支持该功能');"></i> 订阅</button>
+                        <button class="btn btn-dark" id="subscribe" onclick="alert('暂不支持该功能');"><i class="fa fa-star"></i> 订阅</button>
                         {% if novel_artifact.novel.download_link is not None and novel_artifact.novel.download_link != '' %}
                             <a class="btn btn-dark" href="{{ novel_artifact.novel.download_link }}" style="text-shadow: none;"><i class="fa fa-download"></i> 下载</a>
                         {% endif %}

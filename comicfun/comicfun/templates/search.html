@@ -66,6 +66,11 @@
 <div class="container t-shadow" style="margin-top: 7rem">
     <div class="card">
         <div class="card-body">
+            {% if artifact_list_page.object_list.count == 0 %}
+                <div class="card">
+                    <div class="card-body" style="color: rgba(0, 0, 0, .5)">无查询结果</div>
+                </div>
+            {% endif %}
             {% for artifact in artifact_list_page.object_list %}
                 {% if artifact.content_type == 1 %}
                     <div class="card">

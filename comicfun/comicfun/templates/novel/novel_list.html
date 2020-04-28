@@ -24,6 +24,11 @@
     <div class="card">
         <div class="card-header">小说分区</div>
         <div class="card-body">
+            {% if artifact_list_page.object_list.count == 0 %}
+                <div class="card">
+                    <div class="card-body" style="color: rgba(0, 0, 0, .5)">暂无内容</div>
+                </div>
+            {% endif %}
             <div class="row">
                 {% for novel_artifact in artifact_list_page.object_list %}
                     <div class="col-sm-12 col-md-6 col-lg-3">
