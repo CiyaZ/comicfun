@@ -102,8 +102,8 @@ class Artifact(models.Model):
     title = models.CharField(max_length=50, verbose_name='标题')
     desc = models.CharField(max_length=255, verbose_name='作品简介')
     authors = models.ManyToManyField(Author, verbose_name='关联作者')
-    content_tags = models.ManyToManyField('ContentTag', null=True, blank=True, verbose_name='题材标签')
-    data_tags = models.ManyToManyField('DataTag', null=True, blank=True, verbose_name='标签')
+    content_tags = models.ManyToManyField('ContentTag', blank=True, verbose_name='题材标签')
+    data_tags = models.ManyToManyField('DataTag', blank=True, verbose_name='标签')
     create_time = models.DateTimeField(verbose_name='创建时间')
     last_modified_time = models.DateTimeField(verbose_name='最后修改时间')
 
