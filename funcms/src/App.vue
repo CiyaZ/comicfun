@@ -1,17 +1,12 @@
 <template>
   <div id="app">
-    <main-frame></main-frame>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import MainFrame from './pages/MainFrame'
-
 export default {
-  name: 'app',
-  components: {
-      MainFrame
-  }
+  name: 'app'
 }
 </script>
 

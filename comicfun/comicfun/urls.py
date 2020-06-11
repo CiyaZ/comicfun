@@ -33,7 +33,10 @@ from comicfun.views.user.bookmark_view import bookmark_page, add_bookmark, delet
 from comicfun.views.search_view import search_page
 
 urlpatterns = [
+    # 管理后台
     path('admin', admin.site.urls),
+    path('backend/api/', include('cmsapi.urls')),
+    # 前台主页相关
     path('', index),
     path('index', index),
     path('search', search_page),
@@ -42,7 +45,7 @@ urlpatterns = [
     path('login/submit', do_login),
     path('login/captcha', refresh_captcha),
     path('logout', do_logout),
-    # user
+    # 用户操作相关
     path('account', account_info_page),
     path('account/update', do_update_account_info),
     path('bookmark', bookmark_page),

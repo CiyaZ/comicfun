@@ -6,8 +6,8 @@
         <head-icon :active="active"></head-icon>
         <div class="menu-container">
           <el-menu class="el-menu-vertical"
-                   :collapse="isCollapse">
-            <el-menu-item index="1">
+                   :collapse="isCollapse" :router="true">
+            <el-menu-item index="/dashboard">
               <i class="el-icon-odometer"></i>
               <span slot="title">仪表盘</span>
             </el-menu-item>
@@ -92,7 +92,7 @@
                 <span slot="title">站点配置</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="9-1">主题管理</el-menu-item>
+                <el-menu-item index="/siteConfs/ThemeConf">主题管理</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
@@ -101,14 +101,29 @@
       <el-container>
         <el-header class="frame-header">
           <aside-collapse-button :active="active" @toggle="toggle"></aside-collapse-button>
+          <el-dropdown class="frame-menu" trigger="click">
+            <span class="el-dropdown-link">
+              {{loginInfo.username}}
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item @click.native="dropdownDashboard">仪表盘</el-dropdown-item>
+              <el-dropdown-item @click.native="dropdownAccountInfo">账号信息</el-dropdown-item>
+              <el-dropdown-item divided @click.native="dropdownLogout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </el-header>
-        <el-main>开发中(⊙x⊙;)</el-main>
+        <el-main>
+          <router-view></router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
 </template>
 
 <script>
+  import axios from 'axios'
+  import {rspStatusHandler} from "../consts";
   import AsideCollapseButton from '../components/AsideCollapseButton'
   import HeadIcon from '../components/HeadIcon'
 
@@ -118,8 +133,28 @@
       AsideCollapseButton,
       HeadIcon
     },
+    created() {
+      axios
+          .get('/backend/api/loginInfo')
+          .then((resp) => {
+            console.log(resp);
+            this.loginInfo = resp.data.data;
+          })
+          .catch((err) => {
+            console.error(err);
+            let status = err.response.status;
+            this.$message.error(rspStatusHandler('NET', status));
+            if (status === 403){
+              this.$router.replace('/login');
+            }
+          });
+    },
+    mounted() {
+      this.$router.replace('/dashboard');
+    },
     data: function () {
       return {
+        loginInfo: {},
         isCollapse: false
       }
     },
@@ -131,6 +166,32 @@
     methods: {
       toggle: function () {
         this.isCollapse = !this.isCollapse;
+      },
+      dropdownDashboard() {
+        this.$router.replace('/dashboard');
+      },
+      dropdownAccountInfo() {
+        this.$router.replace('/accountInfo');
+      },
+      dropdownLogout() {
+        let that = this;
+        axios
+            .post('/backend/api/logout', {}, {
+              headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
+            })
+            .then((resp) => {
+              console.log(resp);
+              this.$message.success('退出登录成功');
+              this.$router.replace('/login');
+            })
+            .catch((err) => {
+              console.error(err);
+              let status = err.response.status;
+              this.$message.error(rspStatusHandler('NET', status));
+              if (status === 403){
+                this.$router.replace('/login');
+              }
+            });
       }
     }
   }
@@ -187,5 +248,12 @@
 
   .frame-header {
     display: flex;
+    justify-content: space-between;
+  }
+
+  .frame-menu {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
   }
 </style>
