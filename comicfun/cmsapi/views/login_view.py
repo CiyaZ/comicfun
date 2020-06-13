@@ -1,11 +1,13 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.middleware import csrf
+from django.contrib.auth import authenticate, login, logout
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
 from captcha.models import CaptchaStore
-from django.contrib.auth import authenticate, login, logout
 from captcha.helpers import captcha_image_url
+from cmsapi.util.response import APIResponse
 
 
 @api_view(['GET'])
@@ -13,25 +15,17 @@ def generate_captcha_info(request):
     """生成验证码"""
     captcha_key = CaptchaStore.generate_key()
     img_url = captcha_image_url(captcha_key)
-    return Response({
-        'rspCode': '0',
-        'rspMsg': '操作成功',
-        'data': {
-            'captcha_key': captcha_key,
-            'img_url': img_url
-        }
+    return APIResponse.success({
+        'captcha_key': captcha_key,
+        'img_url': img_url
     })
 
 
 @api_view(['GET'])
 def get_csrf(request):
     csrf_token = csrf.get_token(request)
-    return Response({
-        'rspCode': '0',
-        'rspMsg': '操作成功',
-        'data': {
-            'csrf_token': csrf_token
-        }
+    return APIResponse.success({
+        'csrf_token': csrf_token
     })
 
 
@@ -40,19 +34,15 @@ def get_csrf(request):
 def get_login_info(request):
     if request.user.is_authenticated:
         current_user = request.user
-        return Response({
-            'rspCode': '0',
-            'rspMsg': '操作成功',
-            'data': {
-                'username': current_user.username,
-                'email': current_user.email,
-                'first_name': current_user.first_name,
-                'last_name': current_user.last_name,
-                'is_staff': current_user.is_staff
-            }
+        return APIResponse.success({
+            'username': current_user.username,
+            'email': current_user.email,
+            'first_name': current_user.first_name,
+            'last_name': current_user.last_name,
+            'is_staff': current_user.is_staff
         })
     else:
-        return Response({}, status=status.HTTP_403_FORBIDDEN)
+        return APIResponse.failure(status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(['POST'])
@@ -69,50 +59,39 @@ def do_login(request):
             or password is None or password == '' \
             or captcha_key is None or captcha_key == '' \
             or captcha_value is None or captcha_value == '':
-        return Response({
-            'rspCode': '4000',
-            'rspMsg': '参数校验失败',
-            'data': None
-        })
+        return APIResponse.failure(None, api_code='4000', api_msg='参数校验失败')
 
     # 验证码校验
     captcha = CaptchaStore.objects.get(hashkey=captcha_key)
     if captcha.response != captcha_value.lower():
-        return Response({
-            'rspCode': '4001',
-            'rspMsg': '验证码校验失败',
-            'data': None
-        })
+        return APIResponse.failure(api_code='4001', api_msg='验证码校验失败')
 
     # 登录校验
     user = authenticate(request, username=username, password=password)
     if user is None:
-        return Response({
-            'rspCode': '4002',
-            'rspMsg': '用户名或密码错误',
-            'data': None
-        })
+        return APIResponse.failure(api_code='4002', api_msg='用户名或密码错误')
     if not user.is_staff:
-        return Response({
-            'rspCode': '4003',
-            'rspMsg': '用户无后台维护权限',
-            'data': None
-        })
+        return APIResponse.failure(api_code='4003', api_msg='用户无后台维护权限')
     login(request, user)
 
-    return Response({
-        'rspCode': '0',
-        'rspMsg': '登录成功',
-        'data': None
+    # 生成token（funcms使用sessionId，客户端使用token）
+    try:
+        request.user.auth_token.delete()
+    except (AttributeError, ObjectDoesNotExist):
+        pass
+    token = Token.objects.create(user=user)
+
+    return APIResponse.success({
+        'token': token.key
     })
 
 
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def do_logout(request):
+    try:
+        request.user.auth_token.delete()
+    except (AttributeError, ObjectDoesNotExist):
+        pass
     logout(request)
-    return Response({
-        'rspCode': '0',
-        'rspMsg': '登出成功',
-        'data': None
-    })
+    return APIResponse.success()

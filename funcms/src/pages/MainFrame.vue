@@ -17,7 +17,7 @@
                 <span slot="title">内容管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="2-1">分类标签</el-menu-item>
+                <el-menu-item index="/contentManage/contentTagManage">分类标签</el-menu-item>
                 <el-menu-item index="2-2">数据标签</el-menu-item>
                 <el-menu-item index="2-3">Artifact视图</el-menu-item>
               </el-menu-item-group>
@@ -145,12 +145,12 @@
             let status = err.response.status;
             this.$message.error(rspStatusHandler('NET', status));
             if (status === 403){
-              this.$router.replace('/login');
+              this.$router.push('/login');
             }
           });
     },
     mounted() {
-      this.$router.replace('/dashboard');
+      this.$router.push('/dashboard');
     },
     data: function () {
       return {
@@ -168,10 +168,10 @@
         this.isCollapse = !this.isCollapse;
       },
       dropdownDashboard() {
-        this.$router.replace('/dashboard');
+        this.$router.push('/dashboard');
       },
       dropdownAccountInfo() {
-        this.$router.replace('/accountInfo');
+        this.$router.push('/accountInfo');
       },
       dropdownLogout() {
         let that = this;
@@ -182,14 +182,14 @@
             .then((resp) => {
               console.log(resp);
               this.$message.success('退出登录成功');
-              this.$router.replace('/login');
+              this.$router.push('/login');
             })
             .catch((err) => {
               console.error(err);
               let status = err.response.status;
               this.$message.error(rspStatusHandler('NET', status));
               if (status === 403){
-                this.$router.replace('/login');
+                this.$router.push('/login');
               }
             });
       }

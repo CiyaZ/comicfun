@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
+from cmsapi.util.response import APIResponse
 from rest_framework.permissions import IsAdminUser
 from comicfun.models import Conf
 from cmsapi.serializers import ConfSerializer
@@ -11,11 +11,7 @@ def get_conf_list(request):
     if request.method == 'GET':
         confs = Conf.objects.all()
         resp_data = ConfSerializer(instance=confs, many=True)
-        return Response({
-            'rspCode': '0',
-            'rspMsg': '查询成功',
-            'data': resp_data.data
-        })
+        return APIResponse.success(resp_data.data)
     elif request.method == 'POST':
         req_data = request.data
         conf_value_site_theme_color = req_data['mainColor']
@@ -41,8 +37,4 @@ def get_conf_list(request):
                 conf = Conf(conf_key='site_background', conf_value=conf_value_site_background)
                 conf.save()
 
-        return Response({
-            'rspCode': '0',
-            'rspMsg': '操作成功',
-            'data': None
-        })
+        return APIResponse.success()

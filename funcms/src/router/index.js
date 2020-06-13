@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Login from '../pages/Login'
 import MainFrame from '../pages/MainFrame'
 import Dashboard from '../pages/Dashboard'
+import ContentTagManage from '../pages/contentManage/ContentTagManage'
 import ThemeConf from '../pages/siteConfs/ThemeConf'
 
 Vue.use(VueRouter);
@@ -23,6 +24,7 @@ const routes = [
   {
     path: '/', component: MainFrame, children: [
       {path: 'dashboard', component: Dashboard},
+      {path: 'contentManage/contentTagManage', component: ContentTagManage},
       {path: 'siteConfs/ThemeConf', component: ThemeConf},
     ]
   },

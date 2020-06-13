@@ -1,4 +1,14 @@
-let messages = {
+// ComicFun ContentType
+const contentType = [
+  '空占位类型', '小说', '漫画', '动画', '游戏', '绘画图集', '素材资源'
+];
+
+function getContentType(idx) {
+  return contentType[idx];
+}
+
+// 响应定义
+const messages = {
   NET_ERR_403: '403 接口请求被拒绝，请重新登录',
   NET_ERR_404: '404 接口请求不存在',
   NET_ERR_405: '405 接口请求操作类型不存在',
@@ -34,4 +44,4 @@ function rspStatusHandler(namespace, errCode) {
   return result;
 }
 
-export {messages, rspStatusHandler};
+export {contentType, getContentType, messages, rspStatusHandler};

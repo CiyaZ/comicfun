@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <el-card shadow="never">
       <div slot="header">
         <span>主题管理</span>
@@ -13,7 +13,7 @@
             <el-input v-model="themeForm.bgImageUrl"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">确认</el-button>
+            <el-button type="primary" @click="onSubmit" :loading="submitBtnLoading">确认</el-button>
             <el-button type="warning" @click="onReset">重置</el-button>
           </el-form-item>
         </el-form>
@@ -30,6 +30,8 @@
     name: 'ThemeConf',
     data() {
       return {
+        loading: false,
+        submitBtnLoading: false,
         // 表单初始值
         themeFormInit: {
           mainColor: '',
@@ -50,10 +52,12 @@
       }
     },
     created() {
+      this.loading = true;
       axios
           .get('/backend/api/confs')
           .then((resp) => {
             console.log(resp);
+            this.loading = false;
             let data = resp.data.data;
             for (let conf of data) {
               let conf_key = conf.conf_key;
@@ -71,10 +75,11 @@
           })
           .catch((err) => {
             console.error(err);
+            this.loading = false;
             let status = err.response.status;
             this.$message.error(rspStatusHandler('NET', status));
             if (status === 403){
-              this.$router.replace('/login');
+              this.$router.push('/login');
             }
           });
     },
@@ -83,19 +88,24 @@
         let that = this;
         this.$refs.themeForm.validate((valid) => {
           if (valid) {
-            console.log(that);
+            this.submitBtnLoading = true;
             axios
                 .post('/backend/api/confs', this.themeForm, {
                   headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
                 })
                 .then((resp) => {
                   console.log(resp);
+                  this.submitBtnLoading = false;
                   this.$message.success('保存成功');
                 })
                 .catch((err) => {
                   console.error(err);
+                  this.submitBtnLoading = false;
                   let status = err.response.status;
                   this.$message.error(rspStatusHandler('NET', status));
+                  if (status === 403){
+                    this.$router.push('/login');
+                  }
                 });
           }
         });

@@ -19,10 +19,10 @@
               </el-form-item>
               <el-form-item label="验证码" prop="captcha">
                 <el-input v-model="loginForm.captcha" class="captcha-input"></el-input>
-                <img :src="captcha.imgUrl" class="captcha" @click="refreshCaptcha" />
+                <img :src="captcha.imgUrl" class="captcha" @click="refreshCaptcha"/>
               </el-form-item>
               <el-form-item class="pull-right">
-                <el-button type="primary" @click="onSubmit">登录</el-button>
+                <el-button type="primary" @click="onSubmit" :loading="submitBtnLoading">登录</el-button>
                 <el-button type="warning" @click="onReset">重置</el-button>
               </el-form-item>
             </el-form>
@@ -46,6 +46,13 @@
     created() {
       this.refreshCaptcha();
     },
+    mounted() {
+      document.addEventListener('keyup', (ev) => {
+        if (ev.code === 'Enter') {
+          this.onSubmit();
+        }
+      });
+    },
     data() {
       return {
         captcha: {
@@ -68,7 +75,8 @@
             {required: true, message: '请输入验证码', trigger: 'blur'},
             {min: 4, max: 4, message: '请输入正确的验证码格式', trigger: 'blur'},
           ],
-        }
+        },
+        submitBtnLoading: false
       }
     },
     methods: {
@@ -89,31 +97,38 @@
       },
       onSubmit() {
         let that = this;
-        axios
-            .post('/backend/api/login', {
-              username: this.loginForm.username,
-              password: this.loginForm.password,
-              captchaKey: this.captcha.captchaKey,
-              captchaValue: this.loginForm.captcha
-            }, {
-              headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
-            })
-            .then((resp) => {
-              console.log(resp);
-              let rsp = resp.data;
-              if (rsp.rspCode !== '0') {
-                this.$message.error(rsp.rspMsg);
-                this.refreshCaptcha();
-              } else {
-                this.$message.success('登陆成功');
-                this.$router.replace('/')
-              }
-            })
-            .catch((err) => {
-              console.error(err);
-              let status = err.response.status;
-              this.$message.error(rspStatusHandler('NET', status));
-            });
+        this.$refs.loginForm.validate((valid) => {
+          if (valid) {
+            this.submitBtnLoading = true;
+            axios
+                .post('/backend/api/login', {
+                  username: this.loginForm.username,
+                  password: this.loginForm.password,
+                  captchaKey: this.captcha.captchaKey,
+                  captchaValue: this.loginForm.captcha
+                }, {
+                  headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
+                })
+                .then((resp) => {
+                  console.log(resp);
+                  this.submitBtnLoading = false;
+                  let rsp = resp.data;
+                  if (rsp.rspCode !== '0') {
+                    this.$message.error(rsp.rspMsg);
+                    this.refreshCaptcha();
+                  } else {
+                    this.$message.success('登陆成功');
+                    this.$router.push('/')
+                  }
+                })
+                .catch((err) => {
+                  console.error(err);
+                  this.submitBtnLoading = false;
+                  let status = err.response.status;
+                  this.$message.error(rspStatusHandler('NET', status));
+                });
+          }
+        });
       },
       onReset() {
         this.$refs.loginForm.resetFields();

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'captcha',
     'comicfun',
     'cmsapi'
@@ -148,3 +149,10 @@ CAPTCHA_LENGTH = 4
 CAPTCHA_TIMEOUT = 5
 # 验证码宽度和高度
 CAPTCHA_IMAGE_SIZE = (95, 36)
+# drf配置
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
+    )
+}
