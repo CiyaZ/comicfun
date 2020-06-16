@@ -13,6 +13,9 @@ const messages = {
   NET_ERR_404: '404 接口请求不存在',
   NET_ERR_405: '405 接口请求操作类型不存在',
   NET_ERR_500: '500 服务端错误',
+  NET_ERR_502: '502 网关错误',
+  NET_ERR_503: '503 服务不可用',
+  NET_ERR_504: '504 网关超时',
   NET_ERR_DEFAULT: '网络错误'
 };
 
@@ -32,6 +35,15 @@ function rspStatusHandler(namespace, errCode) {
           break;
         case 500:
           result = messages.NET_ERR_500;
+          break;
+        case 502:
+          result = messages.NET_ERR_502;
+          break;
+        case 503:
+          result = messages.NET_ERR_503;
+          break;
+        case 504:
+          result = messages.NET_ERR_504;
           break;
         default:
           result = messages.NET_ERR_DEFAULT;

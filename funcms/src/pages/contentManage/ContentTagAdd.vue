@@ -4,12 +4,12 @@
       <el-form-item label="内容类型" prop="contentType">
         <el-select v-model="addForm.contentType" placeholder="内容类型" value="0">
           <el-option label="空占位类型" value="0"></el-option>
-          <el-option label="小说" value="1"></el-option>
-          <el-option label="漫画" value="2"></el-option>
-          <el-option label="动画" value="3"></el-option>
-          <el-option label="游戏" value="4"></el-option>
-          <el-option label="绘画图集" value="5"></el-option>
-          <el-option label="素材资源" value="6"></el-option>
+          <el-option label="小说" :value="1"></el-option>
+          <el-option label="漫画" :value="2"></el-option>
+          <el-option label="动画" :value="3"></el-option>
+          <el-option label="游戏" :value="4"></el-option>
+          <el-option label="绘画图集" :value="5"></el-option>
+          <el-option label="素材资源" :value="6"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="标签名" prop="name">
@@ -29,8 +29,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import {rspStatusHandler} from "../../consts"
+  import request from '../../utils/request';
 
   export default {
     name: "ContentTagAdd",
@@ -72,30 +71,24 @@
           this.title = '更新内容标签';
           this.updateMode = 'update';
           this.loading = true;
-          axios
-              .get('/backend/api/contentTags/' + idx)
-              .then((resp) => {
-                console.log(resp);
-                this.loading = false;
-                let rsp = resp.data;
-                if (rsp.rspCode !== '0') {
-                  this.$message.error(rsp.rspMsg);
-                } else {
-                  this.addForm.id = rsp.data['id'];
-                  this.addForm.contentType = rsp.data['content_type'];
-                  this.addForm.name = rsp.data['name'];
-                  this.addForm.tagImageUrl = rsp.data['tag_img_url'];
-                }
-              })
-              .catch((err) => {
-                console.error(err);
-                this.loading = false;
-                let status = err.response.status;
-                this.$message.error(rspStatusHandler('NET', status));
-                if (status === 403) {
-                  this.$router.push('/login');
-                }
-              });
+
+          request.get('/backend/api/contentTags/' + idx, {
+            success: (resp) => {
+              this.loading = false;
+              let rsp = resp.data;
+              if (rsp.rspCode !== '0') {
+                this.$message.error(rsp.rspMsg);
+              } else {
+                this.addForm.id = rsp.data['id'];
+                this.addForm.contentType = rsp.data['content_type'];
+                this.addForm.name = rsp.data['name'];
+                this.addForm.tagImageUrl = rsp.data['tag_img_url'];
+              }
+            },
+            failure: () => {
+              this.loading = false;
+            }
+          });
         } else {
           this.title = '添加内容标签';
           this.updateMode = 'add';
@@ -121,57 +114,46 @@
           if (valid) {
             this.loading = true;
             if (this.updateMode === 'update') {
-              axios
-                  .put('/backend/api/contentTags/' + this.addForm.id, this.addForm, {
-                    headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
-                  })
-                  .then((resp) => {
-                    console.log(resp);
-                    this.loading = false;
-                    let rsp = resp.data;
-                    if (rsp.rspCode !== '0') {
-                      this.$message.error(rsp.rspMsg);
-                    } else {
-                      this.$message.success('更新成功');
-                      this.hide();
-                      this.$parent.handleQueryReset();
-                    }
-                  })
-                  .catch((err) => {
-                    console.error(err);
-                    this.loading = false;
-                    let status = err.response.status;
-                    this.$message.error(rspStatusHandler('NET', status));
-                    if (status === 403) {
-                      this.$router.push('/login');
-                    }
-                  });
+
+              request.put('/backend/api/contentTags/' + this.addForm.id, {
+                headers: {'X-CSRFToken': that.$cookies.get('csrftoken')},
+                data: this.addForm,
+                success: (resp) => {
+                  this.loading = false;
+                  let rsp = resp.data;
+                  if (rsp.rspCode !== '0') {
+                    this.$message.error(rsp.rspMsg);
+                  } else {
+                    this.$message.success('更新成功');
+                    this.hide();
+                    this.$parent.handleQueryReset();
+                  }
+                },
+                failure: () => {
+                  this.loading = false;
+                }
+
+              });
             } else {
-              axios
-                  .post('/backend/api/contentTags', this.addForm, {
-                    headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
-                  })
-                  .then((resp) => {
-                    console.log(resp);
-                    this.loading = false;
-                    let rsp = resp.data;
-                    if (rsp.rspCode !== '0') {
-                      this.$message.error(rsp.rspMsg);
-                    } else {
-                      this.$message.success('添加成功');
-                      this.hide();
-                      this.$parent.handleQueryReset();
-                    }
-                  })
-                  .catch((err) => {
-                    console.error(err);
-                    this.loading = false;
-                    let status = err.response.status;
-                    this.$message.error(rspStatusHandler('NET', status));
-                    if (status === 403) {
-                      this.$router.push('/login');
-                    }
-                  });
+
+              request.post('/backend/api/contentTags', {
+                data: this.addForm,
+                headers: {'X-CSRFToken': that.$cookies.get('csrftoken')},
+                success: (resp) => {
+                  this.loading = false;
+                  let rsp = resp.data;
+                  if (rsp.rspCode !== '0') {
+                    this.$message.error(rsp.rspMsg);
+                  } else {
+                    this.$message.success('添加成功');
+                    this.hide();
+                    this.$parent.handleQueryReset();
+                  }
+                },
+                failure: () => {
+                  this.loading = false;
+                }
+              });
             }
           }
         });

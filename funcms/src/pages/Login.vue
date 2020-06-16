@@ -34,8 +34,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import {rspStatusHandler} from "../consts";
+  import request from '../utils/request';
   import CanvasNest from '../components/CanvasNest';
 
   export default {
@@ -81,52 +80,43 @@
     },
     methods: {
       refreshCaptcha() {
-        axios
-            .get('/backend/api/captcha')
-            .then((resp) => {
-              console.log(resp);
-              let data = resp.data.data;
-              this.captcha.captchaKey = data.captcha_key;
-              this.captcha.imgUrl = data.img_url;
-            })
-            .catch((err) => {
-              console.error(err);
-              let status = err.response.status;
-              this.$message.error(rspStatusHandler('NET', status));
-            });
+        request.get('/backend/api/captcha', {
+          success: (resp) => {
+            let data = resp.data.data;
+            this.captcha.captchaKey = data.captcha_key;
+            this.captcha.imgUrl = data.img_url;
+          }
+        });
       },
       onSubmit() {
         let that = this;
         this.$refs.loginForm.validate((valid) => {
           if (valid) {
             this.submitBtnLoading = true;
-            axios
-                .post('/backend/api/login', {
-                  username: this.loginForm.username,
-                  password: this.loginForm.password,
-                  captchaKey: this.captcha.captchaKey,
-                  captchaValue: this.loginForm.captcha
-                }, {
-                  headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
-                })
-                .then((resp) => {
-                  console.log(resp);
-                  this.submitBtnLoading = false;
-                  let rsp = resp.data;
-                  if (rsp.rspCode !== '0') {
-                    this.$message.error(rsp.rspMsg);
-                    this.refreshCaptcha();
-                  } else {
-                    this.$message.success('登陆成功');
-                    this.$router.push('/')
-                  }
-                })
-                .catch((err) => {
-                  console.error(err);
-                  this.submitBtnLoading = false;
-                  let status = err.response.status;
-                  this.$message.error(rspStatusHandler('NET', status));
-                });
+
+            request.post('/backend/api/login', {
+              data: {
+                username: this.loginForm.username,
+                password: this.loginForm.password,
+                captchaKey: this.captcha.captchaKey,
+                captchaValue: this.loginForm.captcha
+              },
+              headers: {'X-CSRFToken': that.$cookies.get('csrftoken')},
+              success: (resp) => {
+                this.submitBtnLoading = false;
+                let rsp = resp.data;
+                if (rsp.rspCode !== '0') {
+                  this.$message.error(rsp.rspMsg);
+                  this.refreshCaptcha();
+                } else {
+                  this.$message.success('登陆成功');
+                  this.$router.push('/')
+                }
+              },
+              failure: () => {
+                this.submitBtnLoading = false;
+              }
+            });
           }
         });
       },

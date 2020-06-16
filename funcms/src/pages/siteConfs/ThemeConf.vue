@@ -23,8 +23,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import {rspStatusHandler} from "../../consts";
+  import request from '../../utils/request';
 
   export default {
     name: 'ThemeConf',
@@ -53,35 +52,27 @@
     },
     created() {
       this.loading = true;
-      axios
-          .get('/backend/api/confs')
-          .then((resp) => {
-            console.log(resp);
-            this.loading = false;
-            let data = resp.data.data;
-            for (let conf of data) {
-              let conf_key = conf.conf_key;
-              let conf_value = conf.conf_value;
-
-              switch (conf_key) {
-                case 'site_theme_color':
-                  this.themeFormInit.mainColor = this.themeForm.mainColor = `${ conf_value }`;
-                  break;
-                case 'site_background':
-                  this.themeFormInit.bgImageUrl = this.themeForm.bgImageUrl = conf_value;
-                  break;
-              }
+      request.get('/backend/api/confs', {
+        success: (resp) => {
+          this.loading = false;
+          let data = resp.data.data;
+          for (let conf of data) {
+            let conf_key = conf.conf_key;
+            let conf_value = conf.conf_value;
+            switch (conf_key) {
+              case 'site_theme_color':
+                this.themeFormInit.mainColor = this.themeForm.mainColor = `${ conf_value }`;
+                break;
+              case 'site_background':
+                this.themeFormInit.bgImageUrl = this.themeForm.bgImageUrl = conf_value;
+                break;
             }
-          })
-          .catch((err) => {
-            console.error(err);
-            this.loading = false;
-            let status = err.response.status;
-            this.$message.error(rspStatusHandler('NET', status));
-            if (status === 403){
-              this.$router.push('/login');
-            }
-          });
+          }
+        },
+        failure: () => {
+          this.loading = false;
+        }
+      });
     },
     methods: {
       onSubmit() {
@@ -89,24 +80,18 @@
         this.$refs.themeForm.validate((valid) => {
           if (valid) {
             this.submitBtnLoading = true;
-            axios
-                .post('/backend/api/confs', this.themeForm, {
-                  headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
-                })
-                .then((resp) => {
-                  console.log(resp);
-                  this.submitBtnLoading = false;
-                  this.$message.success('保存成功');
-                })
-                .catch((err) => {
-                  console.error(err);
-                  this.submitBtnLoading = false;
-                  let status = err.response.status;
-                  this.$message.error(rspStatusHandler('NET', status));
-                  if (status === 403){
-                    this.$router.push('/login');
-                  }
-                });
+
+            request.post('/backend/api/confs', {
+              data: this.themeForm,
+              headers: {'X-CSRFToken': that.$cookies.get('csrftoken')},
+              success: () => {
+                this.submitBtnLoading = false;
+                this.$message.success('保存成功');
+              },
+              failure: () => {
+                this.submitBtnLoading = false;
+              }
+            });
           }
         });
       },

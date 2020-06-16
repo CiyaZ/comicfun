@@ -122,8 +122,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import {rspStatusHandler} from "../consts";
+  import request from '../utils/request';
   import AsideCollapseButton from '../components/AsideCollapseButton'
   import HeadIcon from '../components/HeadIcon'
 
@@ -134,20 +133,11 @@
       HeadIcon
     },
     created() {
-      axios
-          .get('/backend/api/loginInfo')
-          .then((resp) => {
-            console.log(resp);
-            this.loginInfo = resp.data.data;
-          })
-          .catch((err) => {
-            console.error(err);
-            let status = err.response.status;
-            this.$message.error(rspStatusHandler('NET', status));
-            if (status === 403){
-              this.$router.push('/login');
-            }
-          });
+      request.get('/backend/api/loginInfo', {
+        success: (resp) => {
+          this.loginInfo = resp.data.data;
+        }
+      });
     },
     mounted() {
       this.$router.push('/dashboard');
@@ -175,23 +165,13 @@
       },
       dropdownLogout() {
         let that = this;
-        axios
-            .post('/backend/api/logout', {}, {
-              headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
-            })
-            .then((resp) => {
-              console.log(resp);
-              this.$message.success('退出登录成功');
-              this.$router.push('/login');
-            })
-            .catch((err) => {
-              console.error(err);
-              let status = err.response.status;
-              this.$message.error(rspStatusHandler('NET', status));
-              if (status === 403){
-                this.$router.push('/login');
-              }
-            });
+        request.post('/backend/api/logout', {
+          headers: {'X-CSRFToken': that.$cookies.get('csrftoken')},
+          success: () => {
+            this.$message.success('退出登录成功');
+            this.$router.push('/login');
+          }
+        });
       }
     }
   }

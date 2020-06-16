@@ -10,13 +10,13 @@
           <el-form :inline="true" :model="queryForm" class="demo-form-inline">
             <el-form-item label="内容类型">
               <el-select v-model="queryForm.contentType" placeholder="内容类型" value="0">
-                <el-option label="空占位类型" value="0"></el-option>
-                <el-option label="小说" value="1"></el-option>
-                <el-option label="漫画" value="2"></el-option>
-                <el-option label="动画" value="3"></el-option>
-                <el-option label="游戏" value="4"></el-option>
-                <el-option label="绘画图集" value="5"></el-option>
-                <el-option label="素材资源" value="6"></el-option>
+                <el-option label="空占位类型" :value="0"></el-option>
+                <el-option label="小说" :value="1"></el-option>
+                <el-option label="漫画" :value="2"></el-option>
+                <el-option label="动画" :value="3"></el-option>
+                <el-option label="游戏" :value="4"></el-option>
+                <el-option label="绘画图集" :value="5"></el-option>
+                <el-option label="素材资源" :value="6"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item>
@@ -64,9 +64,9 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import {getContentType, rspStatusHandler} from "../../consts"
-  import ContentTagAdd from './ContentTagAdd'
+  import request from '../../utils/request';
+  import {getContentType} from "../../consts";
+  import ContentTagAdd from './ContentTagAdd';
 
   export default {
     name: "ContentTagManage",
@@ -105,31 +105,25 @@
         if (contentType !== null && contentType !== '') {
           params.contentType = contentType;
         }
-        axios
-            .get('/backend/api/contentTags', {params})
-            .then((resp) => {
-              console.log(resp);
-              this.contentTagTable.loading = false;
-              let data = resp.data.data;
-              this.contentTagTable.contentTagData = [];
-              for (let d of data) {
-                this.contentTagTable.contentTagData.push({
-                  id: d.id,
-                  contentType: getContentType(d.content_type),
-                  name: d.name,
-                  tagImageUrl: d.tag_img_url
-                });
-              }
-            })
-            .catch((err) => {
-              console.error(err);
-              this.loading = false;
-              let status = err.response.status;
-              this.$message.error(rspStatusHandler('NET', status));
-              if (status === 403) {
-                this.$router.push('/login');
-              }
-            });
+        request.get('/backend/api/contentTags', {
+          params,
+          success: (resp) => {
+            this.contentTagTable.loading = false;
+            let data = resp.data.data;
+            this.contentTagTable.contentTagData = [];
+            for (let d of data) {
+              this.contentTagTable.contentTagData.push({
+                id: d.id,
+                contentType: getContentType(d.content_type),
+                name: d.name,
+                tagImageUrl: d.tag_img_url
+              });
+            }
+          },
+          failure: () => {
+            this.contentTagTable.loading = false;
+          }
+        });
       },
       handleEdit(row) {
         this.$refs.addDialog.show('update', row.id);
@@ -143,31 +137,23 @@
           type: 'warning'
         }).then(() => {
           this.contentTagTable.loading = true;
-          axios
-              .delete('/backend/api/contentTags', {
-                params: {id: row.id},
-                headers: {'X-CSRFToken': that.$cookies.get('csrftoken')}
-              })
-              .then((resp) => {
-                console.log(resp);
-                this.contentTagTable.loading = false;
-                let rsp = resp.data;
-                if (rsp.rspCode !== '0') {
-                  this.$message.error(rsp.rspMsg);
-                } else {
-                  this.$message.success('删除成功');
-                  this.reloadTable();
-                }
-              })
-              .catch((err) => {
-                console.error(err);
-                this.loading = false;
-                let status = err.response.status;
-                this.$message.error(rspStatusHandler('NET', status));
-                if (status === 403) {
-                  this.$router.push('/login');
-                }
-              });
+          request.delete('/backend/api/contentTags', {
+            params: {id: row.id},
+            headers: {'X-CSRFToken': that.$cookies.get('csrftoken')},
+            success: (resp) => {
+              this.contentTagTable.loading = false;
+              let rsp = resp.data;
+              if (rsp.rspCode !== '0') {
+                this.$message.error(rsp.rspMsg);
+              } else {
+                this.$message.success('删除成功');
+                this.reloadTable();
+              }
+            },
+            failure: () => {
+              this.contentTagTable.loading = false;
+            }
+          });
         });
       }
     }
